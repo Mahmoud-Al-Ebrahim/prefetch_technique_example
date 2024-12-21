@@ -6,28 +6,40 @@ import 'package:prefetch_technique_example/view/widgets/product_item.dart';
 import '../model/products_in_group_model.dart';
 
 class ProductsOfGroupPage extends StatefulWidget {
-  const ProductsOfGroupPage({super.key, required this.groupId});
+  const ProductsOfGroupPage({super.key, required this.groupId, required this.groupSlug});
 
   final String groupId;
+  final String groupSlug;
 
   @override
   State<ProductsOfGroupPage> createState() => _ProductsOfGroupPageState();
 }
 
 class _ProductsOfGroupPageState extends State<ProductsOfGroupPage> {
+
+
+  // ** uncomment this method if you want to run without prefetching **
+
+  // @override
+  // void initState() {
+  //   BlocProvider.of<PrefetchTechniqueBloc>(context).add(PrefetchProductsOfGroupsEvent(groupId: widget.groupId , groupSlug: widget.groupSlug));
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Groups Page' , style: TextStyle(color: Colors.white),),
+          title: const Text('Products Page' , style: TextStyle(color: Colors.white),),
           backgroundColor: Colors.redAccent,
+          foregroundColor: Colors.white,
         ),
         body: BlocBuilder<PrefetchTechniqueBloc, PrefetchTechniqueState>(
             builder: (context, state) {
           if (state.getProductsOfGroupStatus[widget.groupId] ==
               GetProductsOfGroupStatus.loading) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: Colors.redAccent,),
             );
           }
           if (state.getProductsOfGroupStatus[widget.groupId] ==

@@ -1,4 +1,5 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:prefetch_technique_example/model/products_in_group_model.dart';
 import 'dart:ui' as ui;
@@ -34,12 +35,15 @@ class ProductItem extends StatelessWidget {
                           ? Image.asset(
                           'assets/blur_image.png',
                           fit: BoxFit.cover)
-                          : Image.network(
-                          product
+                          : CachedNetworkImage(
+                          imageUrl: product
                               .syncColorImages![0].images![0].filePath!,
                         height: 350,
                         width: 200,
                         fit: BoxFit.cover,
+                  progressIndicatorBuilder: (ctx , url ,_){
+                    return const Center(child: CircularProgressIndicator(color: Colors.redAccent,),);
+                  },
                       )
                     ),
           ),
@@ -91,8 +95,8 @@ class ProductItem extends StatelessWidget {
                                    SizedBox(
                                      height: 290,
                                      width: 200,
-                                     child: Image.network(
-                                       (product.syncColorImages?.isEmpty ?? true)
+                                     child: CachedNetworkImage(
+                                       imageUrl : (product.syncColorImages?.isEmpty ?? true)
                                                  ? product
                                                  .images![0]
                                                  .filePath!
@@ -102,7 +106,9 @@ class ProductItem extends StatelessWidget {
                                                  .filePath!,
                                              height: 290,
     width: 200,
-
+                                       progressIndicatorBuilder: (ctx , url ,_){
+                                         return const Center(child: CircularProgressIndicator(color: Colors.redAccent,),);
+                                       },
                                            )
                                          ,
                                    ),

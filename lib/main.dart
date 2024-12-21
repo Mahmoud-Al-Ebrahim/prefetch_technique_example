@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:prefetch_technique_example/controller/prefetch_technique_bloc.dart';
 import 'package:prefetch_technique_example/view/groups_page.dart';
 
 void main() {
+
+  // to solve this error "CERTIFICATE_VERIFY_FAILED: Hostname mismatch(handshake.cc:393)"
+  HttpOverrides.global = MyHttpOverrides();
+
   runApp(const PrefetchTechniqueExample());
 }
 
@@ -28,3 +34,11 @@ class _PrefetchTechniqueExampleState extends State<PrefetchTechniqueExample> {
   }
 }
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}

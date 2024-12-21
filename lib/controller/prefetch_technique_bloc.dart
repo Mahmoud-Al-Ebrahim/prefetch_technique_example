@@ -16,6 +16,7 @@ class PrefetchTechniqueBloc
     on<PrefetchTechniqueEvent>((event, emit) {});
     on<GetGroupsEvent>(_onGetGroupsEvent);
     on<GetProductsInGroupEvent>(_onGetProductsInGroupEvent);
+    on<PrefetchProductsOfGroupsEvent>(_onPrefetchProductsOfGroupsEvent);
   }
 
   final Dio dio = Dio();
@@ -25,16 +26,18 @@ class PrefetchTechniqueBloc
     emit(state.copyWith(getGroupsStatus: GetGroupsStatus.loading));
     await dio
         .getUri(Uri.parse(
-            'https://market_under_dev_backend.trydos.dev/api/home/boutiques'))
+            'https://recomende_elasticsearch_engin.trydos.dev/api/home/boutiques'))
         .then((response) {
       emit(state.copyWith(
           getGroupsStatus: GetGroupsStatus.success,
           groups: GroupsResponseModel.fromJson(response.data).data!.groups));
     }).catchError((error) {
+      print(error);
       emit(state.copyWith(
         getGroupsStatus: GetGroupsStatus.failed,
       ));
     }).onError((error, stackTrace) {
+      print(error);
       emit(state.copyWith(
         getGroupsStatus: GetGroupsStatus.failed,
       ));
@@ -49,9 +52,9 @@ class PrefetchTechniqueBloc
     emit(state.copyWith(getProductsOfGroupStatus: getProductsOfGroupStatus));
     await dio.getUri(
         Uri.parse(
-            'https://market_under_dev_backend.trydos.dev/api/products/search'),
+            'https://recomende_elasticsearch_engin.trydos.dev/api/products/search'),
         data: {
-          "boutique_slugs": ['"${event.groupId}"'].toString()
+          "boutique_slugs": ['"${event.groupSlug}"'].toString()
         }).then((response) {
       Map<String, List<Product>> productsInEachGroup =
           Map.of(state.productsInEachGroup);
@@ -64,13 +67,22 @@ class PrefetchTechniqueBloc
           getProductsOfGroupStatus: getProductsOfGroupStatus,
           productsInEachGroup: productsInEachGroup));
     }).catchError((error) {
+      print(error);
       getProductsOfGroupStatus = Map.of(state.getProductsOfGroupStatus);
       getProductsOfGroupStatus[event.groupId] = GetProductsOfGroupStatus.failed;
       emit(state.copyWith(getProductsOfGroupStatus: getProductsOfGroupStatus));
     }).onError((error, stackTrace) {
+      print(error);
       getProductsOfGroupStatus = Map.of(state.getProductsOfGroupStatus);
       getProductsOfGroupStatus[event.groupId] = GetProductsOfGroupStatus.failed;
       emit(state.copyWith(getProductsOfGroupStatus: getProductsOfGroupStatus));
     });
+  }
+
+   _onPrefetchProductsOfGroupsEvent(PrefetchProductsOfGroupsEvent event, Emitter<PrefetchTechniqueState> emit) {
+    // check if the data in currently getting or got it before
+    if(state.getProductsOfGroupStatus[event.groupId] == GetProductsOfGroupStatus.loading) return;
+    if(state.getProductsOfGroupStatus[event.groupId] == GetProductsOfGroupStatus.success) return;
+    add(GetProductsInGroupEvent(groupId: event.groupId , groupSlug: event.groupSlug));
   }
 }
