@@ -75,6 +75,8 @@ class _GroupsPageState extends State<GroupsPage> {
   @override
   void initState() {
     scrollController = ScrollController();
+    // ** comment the listener if you want to run it without prefetching **
+
     scrollController.addListener(prefetchProductsOfGroupsWhenUserScroll);
     prefetchTechniqueBloc = BlocProvider.of<PrefetchTechniqueBloc>(context);
     super.initState();
@@ -98,6 +100,7 @@ class _GroupsPageState extends State<GroupsPage> {
             previous.getGroupsStatus != current.getGroupsStatus,
         listener: (context, state) {
           // ** comment the "if statement" if you want to run it without prefetching **
+
           if (state.getGroupsStatus == GetGroupsStatus.success) {
             prefetchProductsOfGroupsWhenGroupsFetchedSuccessfully();
           }
